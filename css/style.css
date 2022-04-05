@@ -1,0 +1,38 @@
+body{
+    margin: 0px;
+    overflow: hidden;
+}
+.wrapper {
+    padding-top: 15px; 
+    padding-left: 350px;
+    padding-right: 350px;
+    padding-bottom: 15px;
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+    grid-auto-rows: 50px;
+}
+
+.case{
+    border: 2px;
+    border-style: solid;
+    border-color: black;
+    align-items: center;
+    display: flex;
+}
+
+#personnage{
+    width: 45px;
+}
+
+#levelUp{
+    width: 45px;
+    display: none;
+}
+
+.mob{
+    width: 25px;
+    margin-left: 10px;
+}
+.level{
+    font-size: 8px;
+}
