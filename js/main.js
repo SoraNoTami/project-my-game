@@ -26,6 +26,8 @@ let mob = {
 }
 let tableauMob = [];
 
+let lose = false
+
 function baliseMob(niveau) {
     return ("<img id='" + numTurn + "'class='mob' src='./assets/mob.png'></img> <p id='text" + numTurn + "' class='level'>" + niveau + "</p>")
 }
@@ -59,6 +61,7 @@ function niveauUp() {
 
 function losing() {
     $("#lose").css('display', 'block')
+    lose = true
 }
 
 function duel(mob, i) {
@@ -80,7 +83,7 @@ function duel(mob, i) {
         personnage.niveau++
         $("#" + mob.turnSpawn).remove()
         $("#text" + mob.turnSpawn).remove()
-        tableauMob.slice((i), mob.turnSpawn)
+        tableauMob.splice((i), 1)
         console.log("égale")
     }
 }
@@ -88,19 +91,22 @@ function duel(mob, i) {
 function turn() {
     numTurn++
     //Apparition des ennemis
-    let spawnMob = [Math.round((Math.random() * 3) + 1), Math.round((Math.random() * 9) + 1)]
-    if (spawnMob[0] === 1) {
-        spawnMob = [10, spawnMob[1]]
-    } else if (spawnMob[0] === 2) {
-        spawnMob = [spawnMob[1], 10]
-    } else if (spawnMob[0] === 3) {
-        spawnMob = [0, spawnMob[1]]
-    } else if (spawnMob[0] === 4) {
-        spawnMob = [spawnMob[1], 0]
-    } else {
-        console.error("error")
+    if (numTurn % 2 !== 0) {
+        var spawnMob = [Math.round((Math.random() * 3) + 1), Math.round((Math.random() * 9) + 1)]
+        if (spawnMob[0] === 1) {
+            spawnMob = [10, spawnMob[1]]
+        } else if (spawnMob[0] === 2) {
+            spawnMob = [spawnMob[1], 10]
+        } else if (spawnMob[0] === 3) {
+            spawnMob = [0, spawnMob[1]]
+        } else if (spawnMob[0] === 4) {
+            spawnMob = [spawnMob[1], 0]
+        } else {
+            console.error("error")
+        }
+        $("#" + spawnMob[0] + "-" + spawnMob[1]).append(baliseMob("?"))
     }
-    $("#" + spawnMob[0] + "-" + spawnMob[1]).append(baliseMob("?"))
+
     tableauMob.forEach(function (mob, i) {
         let mobX = 0
         let mobY = 0
@@ -154,26 +160,46 @@ function turn() {
             duel(mob, i)
         }
 
-
-
         mob.turnUntilLevelup++
         if (mob.turnUntilLevelup - 0 === 0) {
             mob.turnUntilLevelup += 3
             mob.niveau++
         }
+
+        tableauMob.forEach(function (mob2, i2) {
+            if (mob.x === mob2.x && mob.y === mob2.y && mob.turnSpawn !== mob2.turnSpawn) {
+                if (mob.niveau > mob2.niveau || mob.niveau === mob2.niveau) {
+                    $("#" + mob2.turnSpawn).remove()
+                    $("#text" + mob2.turnSpawn).remove()
+                    tableauMob.splice((i2), 1)
+                    mob.niveau++
+                } else if (mob.niveau < mob2.niveau) {
+                    $("#" + mob.turnSpawn).remove()
+                    $("#text" + mob.turnSpawn).remove()
+                    tableauMob.splice((i), 1)
+                    mob2.niveau++
+                }
+            }
+        })
+
+        if (mob.x === levelUp.x && mob.y === levelUp.y) {
+            mob.niveau++
+            spawnLevelUp()
+        }
     })
 
-
-    tableauMob.push(
-        mob = {
-            niveau: Math.round((Math.random() * 1) + 1) + personnage.niveau - 1,
-            turnSpawn: numTurn,
-            turnUntilLevelup: 3,
-            x: spawnMob[0],
-            y: spawnMob[1],
-            balise: baliseMob(mob.niveau)
-        }
-    )
+    if (numTurn % 2 !== 0) {
+        tableauMob.push(
+            mob = {
+                niveau: Math.round((Math.random() * 1) + 1) + personnage.niveau - 1,
+                turnSpawn: numTurn,
+                turnUntilLevelup: 3,
+                x: spawnMob[0],
+                y: spawnMob[1],
+                balise: baliseMob(mob.niveau)
+            }
+        )
+    }
 
     console.log(tableauMob)
     console.log(personnage.niveau)
@@ -181,74 +207,76 @@ function turn() {
 }
 
 function move(event) {
-    if (event.keyCode === 39) {
-        //Droite
-        if (personnage.x < 10) {
-            personnage.x++;
-            tableauMob.forEach(function (mob, i) {
-                if (mob.y === personnage.y && mob.x === personnage.x) {
-                    console.log("duel")
-                    duel(mob, i)
-                }
-            })
-            $("#" + personnage.x + "-" + personnage.y).append(caracter)
-            turn()
+    if (lose !== true) {
+        if (event.keyCode === 39) {
+            //Droite
+            if (personnage.x < 10) {
+                personnage.x++;
+                tableauMob.forEach(function (mob, i) {
+                    if (mob.y === personnage.y && mob.x === personnage.x) {
+                        console.log("duel")
+                        duel(mob, i)
+                    }
+                })
+                $("#" + personnage.x + "-" + personnage.y).append(caracter)
+                turn()
+            } else {
+                turn()
+            }
+        } else if (event.keyCode === 37) {
+            //Gauche
+            if (personnage.x > 0) {
+                personnage.x--
+                tableauMob.forEach(function (mob, i) {
+                    if (mob.y === personnage.y && mob.x === personnage.x) {
+                        console.log("duel")
+                        duel(mob, i)
+                    }
+                })
+                $("#" + personnage.x + "-" + personnage.y).append(caracter)
+                turn()
+            } else {
+                turn()
+            }
+        } else if (event.keyCode === 38) {
+            //Haut
+            if (personnage.y > 0) {
+                personnage.y--;
+                tableauMob.forEach(function (mob, i) {
+                    if (mob.y === personnage.y && mob.x === personnage.x) {
+                        console.log("duel")
+                        duel(mob, i)
+                    }
+                })
+                $("#" + personnage.x + "-" + personnage.y).append(caracter)
+                turn()
+            } else {
+                turn()
+            }
+        } else if (event.keyCode === 40) {
+            //Bas
+            if (personnage.y < 10) {
+                personnage.y++;
+                tableauMob.forEach(function (mob, i) {
+                    if (mob.y === personnage.y && mob.x === personnage.x) {
+                        console.log("duel")
+                        duel(mob, i)
+                    }
+                })
+                $("#" + personnage.x + "-" + personnage.y).append(caracter)
+                turn()
+            } else {
+                turn()
+            }
         } else {
-            turn()
+            console.log(event.keyCode)
+            console.log("Move with arrows")
         }
-    } else if (event.keyCode === 37) {
-        //Gauche
-        if (personnage.x > 0) {
-            personnage.x--
-            tableauMob.forEach(function (mob, i) {
-                if (mob.y === personnage.y && mob.x === personnage.x) {
-                    console.log("duel")
-                    duel(mob, i)
-                }
-            })
-            $("#" + personnage.x + "-" + personnage.y).append(caracter)
-            turn()
-        } else {
-            turn()
+        // console.log(personnage.x, personnage.y, levelUp.x, levelUp.y)
+        if (personnage.x === levelUp.x && personnage.y === levelUp.y) {
+            console.log("level up")
+            niveauUp()
         }
-    } else if (event.keyCode === 38) {
-        //Haut
-        if (personnage.y > 0) {
-            personnage.y--;
-            tableauMob.forEach(function (mob, i) {
-                if (mob.y === personnage.y && mob.x === personnage.x) {
-                    console.log("duel")
-                    duel(mob, i)
-                }
-            })
-            $("#" + personnage.x + "-" + personnage.y).append(caracter)
-            turn()
-        } else {
-            turn()
-        }
-    } else if (event.keyCode === 40) {
-        //Bas
-        if (personnage.y < 10) {
-            personnage.y++;
-            tableauMob.forEach(function (mob, i) {
-                if (mob.y === personnage.y && mob.x === personnage.x) {
-                    console.log("duel")
-                    duel(mob, i)
-                }
-            })
-            $("#" + personnage.x + "-" + personnage.y).append(caracter)
-            turn()
-        } else {
-            turn()
-        }
-    } else {
-        console.log(event.keyCode)
-        console.log("Move with arrows")
-    }
-    // console.log(personnage.x, personnage.y, levelUp.x, levelUp.y)
-    if (personnage.x === levelUp.x && personnage.y === levelUp.y) {
-        console.log("level up")
-        niveauUp()
     }
 }
 document.addEventListener("keydown", move)
