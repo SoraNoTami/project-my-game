@@ -1,7 +1,7 @@
 // import { spawnLevelUp } from "./spawnLevelUp.js";
 
 
-let numTurn = 1
+let numTurn = 0
 
 let personnage = {
     niveau: 1,
@@ -24,13 +24,22 @@ let mob = {
     y: 0,
     travelLog: [],
 }
-
 let tableauMob = [];
+
 function baliseMob(niveau) {
     return ("<img id='" + numTurn + "'class='mob' src='./assets/mob.png'></img> <p id='text" + numTurn + "' class='level'>" + niveau + "</p>")
 }
-function balise2Mob(niveau, Turn) {
-    return ("<img id='" + Turn + "'class='mob' src='./assets/mob.png'></img> <p id='text" + Turn + "' class='level'>" + niveau + "</p>")
+function balise2Mob(niveau, turnSpawn) {
+    return ("<img id='" + turnSpawn + "'class='mob' src='./assets/mob.png'></img> <p id='text" + turnSpawn + "' class='level'>" + niveau + "</p>")
+}
+
+function spawnLevelUp() {
+    let spawnLevelUp = [Math.round((Math.random() * 9) + 1), Math.round((Math.random() * 9) + 1)];
+    levelUp.x = spawnLevelUp[0]
+    levelUp.y = spawnLevelUp[1]
+    $("#levelUp").css('display', 'block')
+    $("#" + levelUp.x + "-" + levelUp.y).append(potion)
+    console.log(personnage.niveau)
 }
 
 function start() {
@@ -43,47 +52,38 @@ function start() {
 
 start()
 
-function spawnLevelUp() {
-    let spawnLevelUp = [Math.round((Math.random() * 9) + 1), Math.round((Math.random() * 9) + 1)];
-    levelUp.x = spawnLevelUp[0]
-    levelUp.y = spawnLevelUp[1]
-    $("#levelUp").css('display', 'block')
-    if (!(levelUp.x === personnage.x && levelUp.y === personnage.y)) {
-        $("#" + levelUp.x + "-" + levelUp.y).append(potion)
-        console.log(personnage.niveau)
-    } else {
-        spawnLevelUp()
-    }
-}
-
 function niveauUp() {
     personnage.niveau++
     spawnLevelUp()
 }
 
-function duel(mob) {
+function losing() {
+    $("#lose").css('display', 'block')
+}
+
+function duel(mob, i) {
+    console.log("id mob(Duel):", i)
     if (personnage.niveau > mob.niveau) {
+        console.log("Duel with the mob:", mob.turnSpawn)
         personnage.niveau++
-        console.log("Duel:" , mob.turnSpawn)
         $("#" + mob.turnSpawn).remove()
         $("#text" + mob.turnSpawn).remove()
-        tableauMob.splice((mob.turnSpawn - 1), 1)
+        tableauMob.splice((i), 1)
         console.log("win")
     } else if (personnage.niveau < mob.niveau) {
+        console.log("Duel with the mob:", mob.turnSpawn)
         $("#personnage").remove()
         console.log("lose")
-        debugger;
+        losing()
     } else {
+        console.log("Duel with the mob:", mob.turnSpawn)
         personnage.niveau++
-        console.log(mob.turnSpawn)
         $("#" + mob.turnSpawn).remove()
         $("#text" + mob.turnSpawn).remove()
-        tableauMob.slice((mob.turnSpawn - 1), mob.turnSpawn)
+        tableauMob.slice((i), mob.turnSpawn)
         console.log("égale")
     }
 }
-
-
 
 function turn() {
     numTurn++
@@ -101,7 +101,7 @@ function turn() {
         console.error("error")
     }
     $("#" + spawnMob[0] + "-" + spawnMob[1]).append(baliseMob("?"))
-    tableauMob.forEach(function (mob) {
+    tableauMob.forEach(function (mob, i) {
         let mobX = 0
         let mobY = 0
         $("#" + mob.turnSpawn).remove()
@@ -151,14 +151,14 @@ function turn() {
         $("#" + mob.x + "-" + mob.y).append(balise2Mob(mob.niveau, mob.turnSpawn))
         if (mob.y === personnage.y && mob.x === personnage.x) {
             console.log("duel")
-            duel(mob)
+            duel(mob, i)
         }
-        
 
-        
-        mob.levelupTurnMob++
-        if (mob.levelupTurnMob - 3 === 0) {
-            mob.levelupTurnMob -= 3
+
+
+        mob.turnUntilLevelup++
+        if (mob.turnUntilLevelup - 0 === 0) {
+            mob.turnUntilLevelup += 3
             mob.niveau++
         }
     })
@@ -166,9 +166,9 @@ function turn() {
 
     tableauMob.push(
         mob = {
-            niveau: Math.round((Math.random() * 2)) + personnage.niveau - 1,
-            turnSpawn: numTurn - 1,
-            levelupTurnMob: 0,
+            niveau: Math.round((Math.random() * 1) + 1) + personnage.niveau - 1,
+            turnSpawn: numTurn,
+            turnUntilLevelup: 3,
             x: spawnMob[0],
             y: spawnMob[1],
             balise: baliseMob(mob.niveau)
@@ -185,10 +185,10 @@ function move(event) {
         //Droite
         if (personnage.x < 10) {
             personnage.x++;
-            tableauMob.forEach(function (mob) {
+            tableauMob.forEach(function (mob, i) {
                 if (mob.y === personnage.y && mob.x === personnage.x) {
                     console.log("duel")
-                    duel(mob)
+                    duel(mob, i)
                 }
             })
             $("#" + personnage.x + "-" + personnage.y).append(caracter)
@@ -200,10 +200,10 @@ function move(event) {
         //Gauche
         if (personnage.x > 0) {
             personnage.x--
-            tableauMob.forEach(function (mob) {
+            tableauMob.forEach(function (mob, i) {
                 if (mob.y === personnage.y && mob.x === personnage.x) {
                     console.log("duel")
-                    duel(mob)
+                    duel(mob, i)
                 }
             })
             $("#" + personnage.x + "-" + personnage.y).append(caracter)
@@ -215,10 +215,10 @@ function move(event) {
         //Haut
         if (personnage.y > 0) {
             personnage.y--;
-            tableauMob.forEach(function (mob) {
+            tableauMob.forEach(function (mob, i) {
                 if (mob.y === personnage.y && mob.x === personnage.x) {
                     console.log("duel")
-                    duel(mob)
+                    duel(mob, i)
                 }
             })
             $("#" + personnage.x + "-" + personnage.y).append(caracter)
@@ -230,10 +230,10 @@ function move(event) {
         //Bas
         if (personnage.y < 10) {
             personnage.y++;
-            tableauMob.forEach(function (mob) {
+            tableauMob.forEach(function (mob, i) {
                 if (mob.y === personnage.y && mob.x === personnage.x) {
                     console.log("duel")
-                    duel(mob)
+                    duel(mob, i)
                 }
             })
             $("#" + personnage.x + "-" + personnage.y).append(caracter)

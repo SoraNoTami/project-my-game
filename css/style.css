@@ -2,6 +2,7 @@ body{
     margin: 0px;
     overflow: hidden;
 }
+
 .wrapper {
     padding-top: 15px; 
     padding-left: 350px;
@@ -33,6 +34,16 @@ body{
     width: 25px;
     margin-left: 10px;
 }
+
 .level{
     font-size: 8px;
+}
+
+#lose{
+    background-color: brown;
+    padding: 50px; 
+    display: none;
+    position: absolute;
+    top: 40%;
+    left: 45%;
 }
