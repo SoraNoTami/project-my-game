@@ -18,6 +18,8 @@ body{
     border-style: solid;
     border-color: black;
     align-items: center;
+    flex-direction: column-reverse;
+    justify-content: center;
     display: flex;
 }
 
@@ -32,11 +34,13 @@ body{
 
 .mob{
     width: 25px;
-    margin-left: 10px;
+    margin: 0;
 }
 
 .level{
-    font-size: 8px;
+    font-size: 13px;
+    margin:0;
+    font-weight: bold;
 }
 
 #lose{

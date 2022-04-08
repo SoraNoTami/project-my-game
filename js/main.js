@@ -163,11 +163,11 @@ function turn() {
             duel(mob, i)
         }
 
-        mob.turnUntilLevelup++
-        if (mob.turnUntilLevelup - 0 === 0) {
-            mob.turnUntilLevelup += 3
-            mob.niveau++
-        }
+        // mob.turnUntilLevelup++
+        // if (mob.turnUntilLevelup - 0 === 0) {
+        //     mob.turnUntilLevelup += 3
+        //     mob.niveau++
+        // }
 
         tableauMob.forEach(function (mob2, i2) {
             if (mob.x === mob2.x && mob.y === mob2.y && mob.turnSpawn !== mob2.turnSpawn) {
