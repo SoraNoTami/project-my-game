@@ -41,9 +41,16 @@ body{
 
 #lose{
     background-color: brown;
+    align-items: center;
     padding: 50px; 
     display: none;
     position: absolute;
-    top: 40%;
+    top: 35%;
     left: 45%;
+}
+
+#yourLevel{
+    position: absolute;
+    left: 10%;
+    top: 40%
 }

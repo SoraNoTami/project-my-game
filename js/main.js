@@ -56,6 +56,7 @@ start()
 
 function niveauUp() {
     personnage.niveau++
+    $("#yourLevel").html("Ton niveau: " + personnage.niveau);
     spawnLevelUp()
 }
 
@@ -69,6 +70,7 @@ function duel(mob, i) {
     if (personnage.niveau > mob.niveau) {
         console.log("Duel with the mob:", mob.turnSpawn)
         personnage.niveau++
+        $("#yourLevel").html("Ton niveau: " + personnage.niveau);
         $("#" + mob.turnSpawn).remove()
         $("#text" + mob.turnSpawn).remove()
         tableauMob.splice((i), 1)
@@ -81,6 +83,7 @@ function duel(mob, i) {
     } else {
         console.log("Duel with the mob:", mob.turnSpawn)
         personnage.niveau++
+        $("#yourLevel").html("Ton niveau: " + personnage.niveau);
         $("#" + mob.turnSpawn).remove()
         $("#text" + mob.turnSpawn).remove()
         tableauMob.splice((i), 1)
@@ -173,17 +176,20 @@ function turn() {
                     $("#text" + mob2.turnSpawn).remove()
                     tableauMob.splice((i2), 1)
                     mob.niveau++
+                    $("#text" + mob.turnSpawn).html("<p id='text" + mob.turnSpawn + "' class='level'>" + mob.niveau + "</p>")
                 } else if (mob.niveau < mob2.niveau) {
                     $("#" + mob.turnSpawn).remove()
                     $("#text" + mob.turnSpawn).remove()
                     tableauMob.splice((i), 1)
                     mob2.niveau++
+                    $("#text" + mob2.turnSpawn).html("<p id='text" + mob2.turnSpawn + "' class='level'>" + mob2.niveau + "</p>")
                 }
             }
         })
 
         if (mob.x === levelUp.x && mob.y === levelUp.y) {
             mob.niveau++
+            $("#text" + mob.turnSpawn).html("<p id='text" + mob.turnSpawn + "' class='level'>" + mob.niveau + "</p>")
             spawnLevelUp()
         }
     })
